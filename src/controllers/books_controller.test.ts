@@ -19,6 +19,13 @@ const dummyBookData = [
 		description:
 			"Before being born, each person must visit the magical Shop Before Life, where they choose what kind of person they will become down on Earth...",
 	},
+	{
+		bookId: 3,
+		title: "This is a Test only",
+		author: "Testing",
+		description:
+			"testing...",
+	},
 ];
 
 afterEach(() => {
@@ -59,7 +66,7 @@ describe("GET /api/v1/books endpoint", () => {
 
 		// Assert
 		expect(res.body).toEqual(dummyBookData);
-		expect(res.body.length).toEqual(2);
+		expect(res.body.length).toEqual(3);
 	});
 });
 
@@ -112,7 +119,7 @@ describe("POST /api/v1/books endpoint", () => {
 		// Act
 		const res = await request(app)
 			.post("/api/v1/books")
-			.send({ bookId: 3, title: "Fantastic Mr. Fox", author: "Roald Dahl" });
+			.send({ bookId: 4, title: "Fantastic Mr. Fox", author: "Roald Dahl" });
 
 		// Assert
 		expect(res.statusCode).toEqual(201);
@@ -133,3 +140,30 @@ describe("POST /api/v1/books endpoint", () => {
 		expect(res.statusCode).toEqual(400);
 	});
 });
+
+describe('DELETE /api/v1/books/:bookId endpoint', () => {
+	test('should return 204 status code when deleting a valid book', async () => {
+	  // Act
+		const res = await request(app)
+		.delete(`/api/v1/books/${3}`)
+
+	// Assert
+		expect(res.statusCode).toEqual(204);
+  
+	  // Try to find the book in the database
+	  const deletedBook = await Book.findByPk(3);
+  
+	  // Expect the book to be null (i.e., not found in the database)
+	  expect(deletedBook).toBeNull();
+	});
+  
+	test('should return 404 status code when trying to delete a non-existent book', async () => {
+	  // Send a DELETE request to the endpoint with an invalid book ID
+	  
+	  const res = await request(app).delete('/api/v1/books/999');
+  
+	  // Expect the response status code to be 404 (Not Found)
+	  expect(res.statusCode).toEqual(404);
+	});
+  });
+  
